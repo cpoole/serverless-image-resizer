@@ -1,0 +1,48 @@
+frameworkVersion: ">=1.2.0 <2.0.0"
+
+service: image-resizer
+
+provider:
+  name: aws
+  profile: personal
+  region: us-west-2
+  environment: ${file(./env.yml)}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/photos/*
+  runtime: nodejs4.3
+
+package:
+  exclude:
+    - .git/**
+
+functions:
+  resize:
+    handler: resizeHandler.resize
+    memorySize: 512
+    timeout: 90
+    events:
+      - sns: ${self:provider.environment.TOPIC_ARN}
+        #topicName: ${self:provider.environment.TOPIC_NAME}
+        #displayName: ${self:provider.environment.TOPIC_NAME}
+        #bucket: ${self:provider.environment.BUCKET_NAME}
+        #event: s3:ObjectCreated:*
+        #  rules:
+        #    #          - prefix: ${self:provider.environment.UPLOAD_PREFIX}
+        #    - suffix: .jpg
+    environment:
+      BUCKET_NAME: ${self:provider.environment.BUCKET_NAME}
+      UPLOAD_PREFIX: ${self:provider.environment.UPLOAD_PREFIX}
+      OUTPUT_PREFIX: ${self:provider.environment.OUTPUT_PREFIX}
+      MAX_X: ${self:provider.environment.MAX_X}
+      OUTPUT_SIZE: ${self:provider.environment.OUTPUT_SIZE}
+
+        #resources:
+        #  Resources:
+        #    SNSTopic:
+        #      Type: AWS::SNS::Topic
+        #      Properties:
+        #        DisplayName: ${self:provider.environment.TOPIC_NAME}
+        #        TopicName: ${self:provider.environment.TOPIC_NAME}

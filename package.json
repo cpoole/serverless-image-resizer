@@ -1,0 +1,10 @@
+{
+  "name": "serverless-image-resizer",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.2.48",
+		"async" : "",
+		"gm" : ""
+  }
+}
